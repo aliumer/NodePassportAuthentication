@@ -12,7 +12,7 @@ const initializePassport = require('./passport-config');
 const methodOverride = require('method-override');
 
 initializePassport(
-    passport, 
+    passport,
     email => users.find(u => u.email === email),
     id => users.find(u => u.id === id)
 )
@@ -22,7 +22,7 @@ const users = [];
 app.set('view-engine', 'ejs');
 
 // telling express we want to read values from forms in our request handlers.
-app.use(express.urlencoded({ extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -33,22 +33,24 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride('_method'));
 
-app.get('/', checkAuthenticated, (req, res) => {
-    res.render('index.ejs', { name: req.user.name} );
+app.get('/', isAuthenticated, (req, res) => {
+    res.render('index.ejs', { name: req.user.name });
 })
 
 app.get('/login', (req, res) => {
     res.render('login.ejs');
 })
 
-app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true
-}));
+app.post('/login'
+    ,checkNotAuthenticated
+    ,passport.authenticate('local', {
+        successRedirect: '/',
+        failureRedirect: '/login',
+        failureFlash: true
+    }));
 
 app.get('/register', checkNotAuthenticated, (req, res) => {
-    res.render('register.ejs' );
+    res.render('register.ejs');
 })
 
 app.post('/register', checkNotAuthenticated, async (req, res) => {
@@ -74,7 +76,7 @@ app.delete('/logout', (req, res) => {
     res.redirect('/login');
 })
 
-function checkAuthenticated(req, res, next) {
+function isAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     } else {
